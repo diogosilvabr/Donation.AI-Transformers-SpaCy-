@@ -5,21 +5,20 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-Este projeto utiliza um modelo de machine learning para analisar textos e identificar linguagem inadequada. 
-O modelo é treinado utilizando o LightGBM, árvore de decisão e dados de feedback para melhorar suas predições ao longo do tempo.
+Este projeto utiliza modelos de machine learning, especificamente Transformers com BERT e SpaCy, para analisar textos e identificar linguagem inadequada.
 
 ## Índice
 
 - [Visão Geral](#visão-geral)
 - [Instalação](#instalação)
 - [Uso](#uso)
+- [Fine-Tuning](#fine-tuning)
 - [Contribuição](#contribuição)
 - [Licença](#licença)
 
 ## Visão Geral
 
-O objetivo deste projeto é criar uma API que possa ser usada para analisar textos e identificar se contêm linguagem inadequada. 
-O modelo utiliza o LightGBM para treinamento e é continuamente aprimorado com dados de feedback fornecidos pelos usuários.
+O objetivo deste projeto é criar uma API que analise textos para identificar se contêm linguagem inadequada. O modelo baseia-se no BERT pré-treinado para o português e é fine-tuned com um conjunto de dados específico para este projeto. O SpaCy também é utilizado para pré-processamento de texto e análise de entidades.
 
 ## Instalação
 
@@ -34,8 +33,8 @@ Siga estas etapas para configurar e executar o projeto localmente.
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/diogosilvabr/Donation.IA.git
-   cd Donation.IA
+   git clone https://github.com/diogosilvabr/Donation.AI-Transformers-SpaCy-.git
+   cd Donation.AI-Transformers-SpaCy-
    ```
 
 2. Crie um ambiente virtual (opcional, mas recomendado em caso de problemas):
@@ -83,24 +82,18 @@ Siga estas etapas para configurar e executar o projeto localmente.
   }
   ```
 
-#### Adicionar Feedback
+## Fine-Tuning
 
-- **URL**: `/add-feedback`
-- **Método**: `POST`
-- **Parâmetros de Entrada**: JSON com os campos `text` e `inappropriate`
-- **Exemplo de Entrada**:
-  ```json
-  {
-    "text": "Texto de exemplo",
-    "inappropriate": 1
-  }
-  ```
-- **Exemplo de Saída**:
-  ```json
-  {
-    "message": "Feedback added successfully"
-  }
-  ```
+O modelo BERT é fine-tuned utilizando um conjunto de dados específico armazenado em `data/base.csv`. Para realizar o fine-tuning:
+
+1. Certifique-se de que o dataset está no formato correto.
+2. Execute o script de fine-tuning:
+```
+python ml/fine_tuning.py
+```
+
+3. O modelo ajustado será salvo no diretório `ml/modelo_finetuned`.
+
 
 ## Contribuição
 
