@@ -3,10 +3,10 @@ import string
 import re
 from transformers import pipeline, BertTokenizer, BertForSequenceClassification
 
-# Carregar o SpaCy uma vez
+# Carregar o SpaCy
 nlp = spacy.load("pt_core_news_sm")
 
-# Carregar o modelo e tokenizer uma vez
+# Carregar o modelo e tokenizer
 modelo_caminho = "ml/modelo_finetuned"
 tokenizer = BertTokenizer.from_pretrained(modelo_caminho)
 modelo = BertForSequenceClassification.from_pretrained(modelo_caminho)
