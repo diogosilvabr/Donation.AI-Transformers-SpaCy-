@@ -7,3 +7,5 @@ spacy
 transformers
 datasets
 torch
+scikit-learn
+
