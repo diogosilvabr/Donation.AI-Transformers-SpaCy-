@@ -1,59 +1,80 @@
-from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments, EarlyStoppingCallback
+from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
 from datasets import load_dataset
-from sklearn.model_selection import train_test_split
 import pandas as pd
+from transformers import EarlyStoppingCallback
+import logging
 
-# Carregar a base de dados CSV em um DataFrame
-df = pd.read_csv("data/base.csv")
+# Configuração de logs
+logging.basicConfig(level=logging.INFO)
 
-# Dividir os dados em treino e teste
-train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
+# Função para carregar o modelo e o tokenizer
+def carregar_modelo_tokenizer(modelo_caminho="neuralmind/bert-base-portuguese-cased"):
+    logging.info(f"Carregando o modelo e o tokenizer de {modelo_caminho}")
+    tokenizer = BertTokenizer.from_pretrained(modelo_caminho, do_lower_case=False)
+    modelo = BertForSequenceClassification.from_pretrained(modelo_caminho, num_labels=2)
+    return modelo, tokenizer
 
-# Salvar os conjuntos de dados separados
-train_df.to_csv("ml/train.csv", index=False)
-test_df.to_csv("ml/test.csv", index=False)
+# Função para carregar e processar o dataset
+def carregar_dataset(caminho_csv="../data/base.csv"):
+    logging.info(f"Carregando dataset de {caminho_csv}")
+    dataset = load_dataset("csv", data_files={"train": caminho_csv})
+    return dataset
 
-# Carregar o tokenizer e o modelo para fine-tuning em classificação
-tokenizer = BertTokenizer.from_pretrained("neuralmind/bert-base-portuguese-cased")
-model = BertForSequenceClassification.from_pretrained("neuralmind/bert-base-portuguese-cased", num_labels=2)
+# Função para tokenizar o dataset
+def tokenizar_dataset(dataset, tokenizer):
+    logging.info("Tokenizando o dataset")
+    def tokenize_function(examples):
+        return tokenizer(examples["text"], padding="max_length", truncation=True)
+    
+    tokenized_datasets = dataset.map(tokenize_function, batched=True)
+    tokenized_datasets = tokenized_datasets.rename_column("inappropriate", "labels")  # Renomear coluna de rótulos
+    return tokenized_datasets
 
-# Carregar a base de dados CSV em DataFrames e convertê-los para o formato do Hugging Face
-dataset = load_dataset("csv", data_files={"train": "ml/train.csv", "test": "ml/test.csv"})
+# Função para configurar o treinamento
+def configurar_treinamento(modelo, tokenized_datasets, output_dir="./results"):
+    logging.info("Configurando o treinamento")
+    
+    training_args = TrainingArguments(
+        output_dir=output_dir,
+        evaluation_strategy="epoch",
+        per_device_train_batch_size=8,
+        per_device_eval_batch_size=8,
+        num_train_epochs=3,
+        weight_decay=0.01,
+        logging_dir="./logs",
+        logging_steps=10,
+        load_best_model_at_end=True
+    )
+    
+    # Definindo o Trainer com Early Stopping
+    trainer = Trainer(
+        model=modelo,
+        args=training_args,
+        train_dataset=tokenized_datasets["train"],
+        tokenizer=tokenizer,
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+    )
+    return trainer
 
-def tokenize_function(examples):
-    return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
+# Função principal para rodar o fine-tuning
+def executar_fine_tuning():
+    # Carregar o modelo e tokenizer
+    modelo, tokenizer = carregar_modelo_tokenizer()
 
-# Certifique-se de que o conjunto de dados tenha as colunas corretas
-tokenized_datasets = dataset.map(tokenize_function, batched=True)
-tokenized_datasets = tokenized_datasets.rename_column("inappropriate", "labels")
+    # Carregar e tokenizar o dataset
+    dataset = carregar_dataset()
+    tokenized_datasets = tokenizar_dataset(dataset, tokenizer)
 
-# Definir os argumentos de treinamento
-training_args = TrainingArguments(
-    output_dir="/results",
-    eval_strategy="epoch",  # Correção aqui
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
-    num_train_epochs=2,
-    weight_decay=0.01,
-    save_strategy="epoch",  # Salvamento do modelo a cada época
-    logging_dir="./logs",  # Diretório para logs
-    logging_strategy="epoch",  # Log a cada época
-    load_best_model_at_end=True,  # Carregar o melhor modelo no final do treinamento
-)
+    # Configurar e iniciar o treinamento
+    trainer = configurar_treinamento(modelo, tokenized_datasets)
+    
+    logging.info("Iniciando o treinamento")
+    trainer.train()
 
-# Definir o objeto Trainer com EarlyStoppingCallback
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=tokenized_datasets["train"],
-    eval_dataset=tokenized_datasets["test"],
-    tokenizer=tokenizer,
-    callbacks=[EarlyStoppingCallback(early_stopping_patience=2)],  # Adicionar EarlyStoppingCallback
-)
+    # Salvar o modelo e tokenizer treinados
+    modelo.save_pretrained("modelo_finetuned")
+    tokenizer.save_pretrained("modelo_finetuned")
+    logging.info("Modelo e tokenizer salvos com sucesso em 'modelo_finetuned'.")
 
-# Iniciar o treinamento
-trainer.train()
-
-# Salvar o modelo fine-tuned
-model.save_pretrained("modelo_finetuned")
-tokenizer.save_pretrained("modelo_finetuned")
+if __name__ == "__main__":
+    executar_fine_tuning()
