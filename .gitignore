@@ -1,6 +1,17 @@
 venv/
+.env
 
 __pycache__/
 *.py[cod]
 *.pyo
+ml/results/
+ml/runs/
+*.pt
+*.bin
+*.json
+*.safetensors
+
+# Ignorar dados temporários e logs
+*.log
+*.csv
 

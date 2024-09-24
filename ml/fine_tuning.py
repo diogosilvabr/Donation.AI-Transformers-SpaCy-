@@ -1,17 +1,18 @@
 from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
 from datasets import load_dataset
 import logging
+import torch
 
 logging.basicConfig(level=logging.INFO)
 
 # Função para carregar o dataset e renomear a coluna de rótulos
-def carregar_dataset(caminho_csv="data/base.csv"):
+def carregar_dataset(caminho_csv="../data/base.csv"):
     logging.info(f"Carregando dataset de {caminho_csv}")
     dataset = load_dataset("csv", data_files=caminho_csv)
-    
-    # Renomear a coluna de rótulos para 'labels'
+    # Renomeia a coluna de rótulos
     dataset = dataset['train'].rename_column("inappropriate", "labels")
-    
+    # Divide em treino e validação
+    dataset = dataset.train_test_split(test_size=0.2, seed=42)
     return dataset
 
 # Função para tokenizar o dataset
@@ -19,11 +20,10 @@ def tokenizar_dataset(dataset, tokenizer):
     logging.info("Tokenizando o dataset")
     
     def tokenize_function(examples):
-        return tokenizer(examples["text"], padding="max_length", truncation=True)
-    
+        return tokenizer(examples["text"], padding="longest", truncation=True, max_length=60)
+
     tokenized_datasets = dataset.map(tokenize_function, batched=True)
     return tokenized_datasets
-
 
 # Função para configurar o treinamento
 def configurar_treinamento(modelo, tokenized_datasets, tokenizer):
@@ -31,21 +31,24 @@ def configurar_treinamento(modelo, tokenized_datasets, tokenizer):
     
     training_args = TrainingArguments(
         output_dir="./results",
-        evaluation_strategy="steps",  # Mudar para 'steps'
-        per_device_train_batch_size=8,
-        per_device_eval_batch_size=8,
-        num_train_epochs=3,
+        logging_dir="./runs",
+        evaluation_strategy="steps",  # Avalia a cada step definido em eval_steps
+        save_strategy="steps",  # Salva a cada step definido em save_steps
+        per_device_train_batch_size=4,  # Ajuste se houver problemas de memória na GPU
+        per_device_eval_batch_size=4,
+        num_train_epochs=5,
         weight_decay=0.01,
-        save_steps=500,  # Defina quando deseja salvar
-        eval_steps=500,  # Defina quando deseja avaliar
+        save_steps=200,
+        eval_steps=200,
         save_total_limit=1,
-        load_best_model_at_end=True,  # Isso agora funcionará corretamente
-)
+        load_best_model_at_end=True,
+    )
     
     trainer = Trainer(
         model=modelo,
         args=training_args,
-        train_dataset=tokenized_datasets,  # Remova ["train"] se não houver divisão
+        train_dataset=tokenized_datasets['train'],
+        eval_dataset=tokenized_datasets['test'],
         tokenizer=tokenizer,
     )
     
