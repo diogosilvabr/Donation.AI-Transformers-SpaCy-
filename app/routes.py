@@ -11,6 +11,11 @@ api_bp = Blueprint('api', __name__)
 def analyze_text():
     data = request.json
     texto = data.get('text', '')
+    
+    # Verifica se o texto foi fornecido
+    if not texto:
+        logging.error("Texto não fornecido")
+        return jsonify({"erro": "Texto não fornecido"}), 400
 
     # Log para verificar o texto recebido
     logging.info(f"Texto recebido: {texto}")

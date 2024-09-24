@@ -9,4 +9,5 @@ datasets
 torch
 scikit-learn
 accelerate
+tf-keras
 
