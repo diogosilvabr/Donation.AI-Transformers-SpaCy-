@@ -2,13 +2,13 @@ import logging
 from flask import Blueprint, request, jsonify
 from .preprocessing import preprocessarTexto, classificarTextoInadequado
 
-# Configuração básica de logs
+# Configuração de logs
 logging.basicConfig(level=logging.INFO)
 
-# Blueprint da API
+# Cria o blueprint da API
 api_bp = Blueprint('api', __name__)
 
-# Dicionário de mapeamento para tornar os rótulos mais legíveis
+# Mapeamento dos rótulos para termos de melhor entendimento
 label_map = {
     "LABEL_0": "Adequado",
     "LABEL_1": "Inadequado"
@@ -25,18 +25,14 @@ def analyze_text():
 
     logging.info(f"Texto recebido: {texto}")
 
-    # Pré-processar o texto
+    # Pré-processa e classifica o texto
     texto_processado = preprocessarTexto(texto)
-    
-    # Classificar o texto usando o modelo treinado
     classificacao = classificarTextoInadequado(texto_processado)
-    # Classificar o texto usando o modelo treinado
-    logging.info(f"Classificação bruta retornada pelo modelo: {classificacao}")
+    logging.info(f"Classificação bruta: {classificacao}")
 
-    # Aplicar o mapeamento para tornar a classificação mais legível
+    # Mapeia o rótulo para uma classificação legível
     classificacao_legivel = label_map.get(classificacao, classificacao)
-
-    logging.info(f"Classificação: {classificacao_legivel}")
+    logging.info(f"Classificação legível: {classificacao_legivel}")
 
     return jsonify({
         'texto_processado': texto_processado,

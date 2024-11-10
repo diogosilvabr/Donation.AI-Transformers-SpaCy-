@@ -1,18 +1,14 @@
 from transformers import pipeline
 
-# Carregar o modelo treinado
-model = pipeline("text-classification", model="./runs/checkpoint-1200")  # Substitua pelo caminho correto do modelo
+# Carrega o modelo de classificação de texto do Hugging Face Transformers
+model = pipeline("text-classification", model="./runs/checkpoint-1200")
 
 def preprocessarTexto(texto):
-    # Função de pré-processamento (ajuste conforme necessário)
+    # Converte o texto para minúsculas com o pré-processamento básico
     return texto.lower()
 
 def classificarTextoInadequado(texto_processado):
-    # Fazer a classificação do texto usando o modelo treinado
+    # Classifica o texto pré-processado usando o modelo
     resultado = model(texto_processado)
-    
-    # Extraia o rótulo de `resultado`, assumindo que ele retorne uma lista de dicionários
-    label = resultado[0]['label']  # Isso deve retornar "label_0" ou "label_1"
-    
+    label = resultado[0]['label']  # Obtém o rótulo de classificação ("LABEL_0 = Adequado" ou "LABEL_1" = Inadequeado) 
     return label
-

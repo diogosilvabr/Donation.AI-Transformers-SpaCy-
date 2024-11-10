@@ -1,13 +1,4 @@
 flask
 flask-cors
-pandas
-numpy
-python-dotenv
-spacy
-accelerate
 transformers==4.30.2
-datasets==2.3.2
 torch==2.0.1
-scikit-learn==1.2.2
-evaluate
-

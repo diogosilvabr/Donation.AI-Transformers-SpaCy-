@@ -1,17 +1,21 @@
+# Ambiente virtual e arquivos de ambiente
 venv/
 .env
 
+# Arquivos de cache e compilação
 __pycache__/
 *.py[cod]
 *.pyo
+
+# Modelos, checkpoints e arquivos temporários
 ml/results/
 ml/runs/
+runs/
+logs/
 *.pt
 *.bin
-*.json
 *.safetensors
 
-# Ignorar dados temporários e logs
+# Ignorar arquivos de log e métricas gerados
 *.log
-*.csv
-
+runs/*.csv  # Apenas arquivos CSV de métricas gerados em runs/
