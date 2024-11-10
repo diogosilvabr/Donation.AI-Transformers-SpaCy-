@@ -41,7 +41,7 @@ def executar_fine_tuning():
             evaluation_strategy="epoch",  # Avaliação a cada época
             save_strategy="epoch",  # Salvamento do modelo a cada época
             logging_dir="./logs",  # Diretório dos logs detalhados
-            num_train_epochs=3,  # Número total de épocas
+            num_train_epochs=15,  # Número total de épocas
             per_device_train_batch_size=8,  # Tamanho do batch de treinamento
             per_device_eval_batch_size=8,  # Tamanho do batch de avaliação
             weight_decay=0.01,  # Fator de decaimento do peso

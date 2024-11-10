@@ -37,10 +37,12 @@ Siga estas etapas para configurar e executar o projeto localmente.
    cd Donation.AI-Transformers-SpaCy-
    ```
 
-2. Crie um ambiente virtual (opcional, mas recomendado em caso de problemas):
+2. Crie um ambiente virtual (opcional, mas recomendado):
    ```bash
    python -m venv venv
-   .\venv\Scripts\Activate
+   .\venv\Scripts\Activate  # No Windows
+   # Ou, no Linux/macOS
+   source venv/bin/activate
    ```
 
 3. Instale as dependências:
@@ -48,17 +50,12 @@ Siga estas etapas para configurar e executar o projeto localmente.
    pip install -r requirements.txt
    ```
 
-4. Configure as variáveis de ambiente (opcional):
-   - Copie o arquivo `.env.example` para `.env` e configure as variáveis necessárias.
-   - Exemplo de conteúdo do `.env`:
-     ```
-     FLASK_ENV=development
-     ```
-
-5. Execute a aplicação:
+4. Execute a aplicação:
    ```bash
-   flask run ou python run.py
+   python run.py
    ```
+
+   O arquivo `run.py` já está configurado para rodar o aplicativo Flask em modo de depuração (`debug=True`), permitindo uma visualização detalhada dos erros e recarregamento automático durante o desenvolvimento.
 
 ## Uso
 
@@ -84,16 +81,19 @@ Siga estas etapas para configurar e executar o projeto localmente.
 
 ## Fine-Tuning
 
-O modelo BERT é fine-tuned utilizando um conjunto de dados específico armazenado em `data/base.csv`. Para realizar o fine-tuning:
+O modelo BERT é fine-tuned utilizando um conjunto de dados específico armazenado em `data/base.csv`. O treinamento salva logs e métricas automaticamente, e gera um gráfico de acurácia por época.
+
+Para realizar o fine-tuning:
 
 1. Certifique-se de que o dataset está no formato correto.
 2. Execute o script de fine-tuning:
-```
-python ml/fine_tuning.py
-```
+   ```bash
+   python ml/fine_tuning.py
+   ```
 
-3. O modelo ajustado será salvo no diretório `ml/modelo_finetuned`.
-
+   - O modelo ajustado será salvo no diretório `runs/`.
+   - As métricas serão salvas em `runs/metrics_acumuladas.csv`.
+   - Um gráfico de acurácia por época será gerado automaticamente como `runs/epoch_vs_accuracy_acumulado.png`.
 
 ## Contribuição
 
