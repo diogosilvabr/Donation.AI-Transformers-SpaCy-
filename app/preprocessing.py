@@ -1,26 +1,13 @@
-import spacy
-import string
-import re
-from transformers import pipeline, BertTokenizer, BertForSequenceClassification
+from transformers import pipeline
 
-# Carregar o SpaCy e o modelo
-nlp = spacy.load("pt_core_news_sm")
-modelo_caminho = "ml/modelo_finetuned"
-tokenizer = BertTokenizer.from_pretrained(modelo_caminho)
-modelo = BertForSequenceClassification.from_pretrained(modelo_caminho)
-classificador = pipeline("text-classification", model=modelo, tokenizer=tokenizer)
+# Carregar o modelo treinado
+model = pipeline("text-classification", model="path_to_trained_model")  # Substitua pelo caminho correto do modelo
 
-# Função de pré-processamento do texto
 def preprocessarTexto(texto):
-    texto = texto.lower()
-    texto = re.sub(r'\d+', '', texto).strip()
-    
-    # Processamento com SpaCy
-    doc = nlp(texto)
-    tokens = [token.lemma_ for token in doc if not token.is_stop]
-    return " ".join(tokens)
+    # Função de pré-processamento (ajuste conforme necessário)
+    return texto.lower()
 
-# Função para classificar o texto usando o modelo fine-tuned
-def classificarTextoInadequado(texto):
-    resultado = classificador(texto)
-    return resultado
+def classificarTextoInadequado(texto_processado):
+    # Fazer a classificação do texto usando o modelo treinado
+    resultado = model(texto_processado)
+    return resultado[0]['label']

@@ -20,8 +20,10 @@ def analyze_text():
     # Log para verificar o texto recebido
     logging.info(f"Texto recebido: {texto}")
 
-    # Pré-processar e classificar o texto
+    # Pré-processar o texto
     texto_processado = preprocessarTexto(texto)
+    
+    # Classificar o texto usando o modelo treinado
     classificacao = classificarTextoInadequado(texto_processado)
 
     # Log para verificar o resultado da classificação
