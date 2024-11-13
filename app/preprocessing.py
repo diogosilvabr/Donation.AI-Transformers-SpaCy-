@@ -1,7 +1,7 @@
 from transformers import pipeline
 
 # Carrega o modelo de classificação de texto do Hugging Face Transformers
-model = pipeline("text-classification", model="./runs/checkpoint-1200")
+model = pipeline("text-classification", model="./runs/checkpoint-2200")
 
 def preprocessarTexto(texto):
     # Converte o texto para minúsculas com o pré-processamento básico

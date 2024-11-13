@@ -8,9 +8,6 @@ __pycache__/
 *.pyo
 
 # Modelos, checkpoints e arquivos temporários
-ml/results/
-ml/runs/
-runs/
 logs/
 *.pt
 *.bin
