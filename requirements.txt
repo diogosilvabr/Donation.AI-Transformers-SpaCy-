@@ -1,4 +1,6 @@
 flask
 flask-cors
-transformers==4.30.2
-torch==2.0.1
+transformers
+torch
+pandas
+matplotlib
